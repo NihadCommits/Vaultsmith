@@ -8,6 +8,8 @@ export interface FieldContext {
   get(name: string): unknown;
   /** Store a value. `rerender` redraws the form (use after chip changes, not while typing). */
   set(name: string, value: unknown, rerender?: boolean): void;
+  /** Redraws the form without moving the focus. */
+  refresh(): void;
   /** Opens the "Create value" dialog; resolves with the new value or null. */
   createValue(field: FieldDef, typed: string): Promise<CatalogValue | null>;
 }
@@ -97,13 +99,23 @@ function renderChips(setting: Setting, field: FieldDef, ctx: FieldContext, items
   const wrap = chipBox(setting);
   for (const item of items) chip(wrap, show(item), undefined, false, () => ctx.set(field.name, items.filter((i) => i !== item), true));
   const input = wrap.createEl("input", { type: "text", cls: "vaultsmith-chip-input", attr: { placeholder: "Type and press Enter", "data-field": field.name } });
+  const commit = (): boolean => {
+    const text = input.value.trim();
+    input.value = "";
+    if (!text || items.some((i) => i.toLowerCase() === text.toLowerCase())) return false;
+    ctx.set(field.name, [...items, text]);
+    return true;
+  };
   input.addEventListener("keydown", (e) => {
     if (e.key !== "Enter") return;
     e.preventDefault();
     e.stopPropagation(); // don't trigger "Create note"
-    const text = input.value.trim();
-    if (text && !items.some((i) => i.toLowerCase() === text.toLowerCase())) ctx.set(field.name, [...items, text], true);
-    else input.value = "";
+    if (commit()) ctx.set(field.name, ctx.get(field.name), true);
+  });
+  // Typed text without Enter must not get lost when the user clicks "Save" right away:
+  // store it now (before the click), redraw the chips afterwards without stealing focus.
+  input.addEventListener("blur", () => {
+    if (commit()) window.setTimeout(() => ctx.refresh(), 0);
   });
 }
 

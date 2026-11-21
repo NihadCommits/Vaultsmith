@@ -4,6 +4,8 @@ import type VaultsmithPlugin from "./main";
 export interface VaultsmithSettings {
   configFolder: string;
   templatesFolder: string;
+  /** Choice field shown in the status bar. */
+  statusField: string;
   /** Type preselected in "New note". */
   lastSchema?: string;
 }
@@ -11,6 +13,7 @@ export interface VaultsmithSettings {
 export const DEFAULT_SETTINGS: VaultsmithSettings = {
   configFolder: "_Vaultsmith",
   templatesFolder: "Templates",
+  statusField: "status",
 };
 
 export class VaultsmithSettingTab extends PluginSettingTab {
@@ -44,6 +47,19 @@ export class VaultsmithSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.templatesFolder = value.trim() || DEFAULT_SETTINGS.templatesFolder;
             await this.plugin.saveSettings();
+          }),
+      );
+    new Setting(containerEl)
+      .setName("Status field")
+      .setDesc("Choice field shown in the status bar, with arrows to step through its catalog.")
+      .addText((text) =>
+        text
+          .setPlaceholder(DEFAULT_SETTINGS.statusField)
+          .setValue(this.plugin.settings.statusField)
+          .onChange(async (value) => {
+            this.plugin.settings.statusField = value.trim() || DEFAULT_SETTINGS.statusField;
+            await this.plugin.saveSettings();
+            this.plugin.scheduleReload();
           }),
       );
   }

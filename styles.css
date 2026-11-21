@@ -81,3 +81,40 @@
   color: var(--text-muted);
   font-size: var(--font-ui-smaller);
 }
+
+.vaultsmith-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--size-2-2);
+}
+
+.vaultsmith-status-arrow,
+.vaultsmith-status-label {
+  cursor: pointer;
+  padding: 0 var(--size-2-1);
+  border-radius: var(--radius-s);
+}
+
+.vaultsmith-status-arrow:hover,
+.vaultsmith-status-label:hover {
+  background: var(--background-modifier-hover);
+}
+
+.vaultsmith-status-arrow.is-disabled {
+  opacity: 0.3;
+  cursor: default;
+  background: none;
+}
+
+.vaultsmith-status-dot {
+  color: var(--text-faint);
+  margin-right: var(--size-2-1);
+}
+
+.vaultsmith-status-label.is-invalid {
+  color: var(--color-red);
+}
+
+.vaultsmith-removed {
+  color: var(--color-orange);
+}

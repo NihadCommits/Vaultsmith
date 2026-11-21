@@ -1,8 +1,9 @@
-import { Modal, Notice, Setting, normalizePath, parseYaml, stringifyYaml, type TextComponent } from "obsidian";
+import { Modal, Notice, Setting, TFile, normalizePath, parseYaml, stringifyYaml, type TextComponent } from "obsidian";
+import { aliasesAfterRename, removedKeys, valuesFromFrontmatter } from "../core/edit";
 import { sanitizeTitle } from "../core/filename";
 import { buildFrontmatter, defaultValues, missingRequired } from "../core/frontmatter";
 import { findDuplicates, type Duplicate, type NoteInfo } from "../core/notes";
-import { chainOf, fieldsOf, folderOf, templateOf } from "../core/resolve";
+import { chainOf, detectSchema, fieldsOf, folderOf, templateOf, type Detection } from "../core/resolve";
 import { fillPlaceholders, mergeFrontmatter, splitFrontmatter } from "../core/template";
 import type { CatalogValue, Config, FieldDef } from "../core/types";
 import type VaultsmithPlugin from "../main";
@@ -10,6 +11,16 @@ import { appendCatalogValue, ensureFolder, listFolders, listNotes, listTemplates
 import { CreateValueModal } from "./CreateValueModal";
 import { renderField, type FieldContext } from "./fields";
 
+/** Edit mode: what the note looked like when the dialog opened. */
+interface EditState {
+  file: TFile;
+  fm: Record<string, unknown>;
+  detection: Detection | null;
+  folder: string;
+  bodyEmpty: boolean;
+}
+
+/** "New note" and "Edit properties" share this dialog; `file` switches to edit mode. */
 export class NoteModal extends Modal {
   private title = "";
   /** Chosen schema ids below the root, one per level. */
@@ -23,13 +34,16 @@ export class NoteModal extends Modal {
   private showYaml = false;
   private notes: NoteInfo[] = [];
   private busy = false;
+  private edit: EditState | null = null;
+  private moveToDefault = false;
+  private keepOldTitle = true;
 
   private infoEl!: HTMLElement;
   private formEl!: HTMLElement;
   private yamlEl: HTMLElement | null = null;
   private errorEl!: HTMLElement;
 
-  constructor(private plugin: VaultsmithPlugin, private config: Config) {
+  constructor(private plugin: VaultsmithPlugin, private config: Config, private file?: TFile) {
     super(plugin.app);
   }
 
@@ -37,25 +51,46 @@ export class NoteModal extends Modal {
     return this.path[this.path.length - 1];
   }
 
-  onOpen(): void {
+  async onOpen(): Promise<void> {
     this.modalEl.addClass("vaultsmith-modal");
-    this.titleEl.setText("New note");
-    this.notes = listNotes(this.app);
+    this.titleEl.setText(this.file ? "Edit properties" : "New note");
+    this.notes = listNotes(this.app).filter((n) => n.path !== this.file?.path);
 
-    const last = this.plugin.settings.lastSchema;
-    if (last && this.config.schemas.has(last)) this.path = chainOf(this.config, last).slice(1).map((s) => s.id);
+    if (this.file) {
+      const fm = { ...(this.app.metadataCache.getFileCache(this.file)?.frontmatter ?? {}) } as Record<string, unknown>;
+      const detection = detectSchema(this.config, fm);
+      const text = await this.app.vault.read(this.file);
+      this.edit = {
+        file: this.file,
+        fm,
+        detection,
+        folder: this.file.parent && !this.file.parent.isRoot() ? this.file.parent.path : "",
+        bodyEmpty: splitFrontmatter(text).body.trim() === "",
+      };
+      this.title = this.file.basename;
+      if (detection) this.path = chainOf(this.config, detection.schema.id).slice(1).map((s) => s.id);
+      this.values = valuesFromFrontmatter(this.config, detection?.schema.id, fm);
+      // Untyped notes, or notes still in their type's default folder, follow the type by default.
+      const oldDefault = detection ? folderOf(this.config, detection.schema.id) : undefined;
+      this.moveToDefault = !detection || oldDefault === this.edit.folder;
+    } else {
+      const last = this.plugin.settings.lastSchema;
+      if (last && this.config.schemas.has(last)) this.path = chainOf(this.config, last).slice(1).map((s) => s.id);
+    }
     this.applySchema();
 
     let titleInput: TextComponent | undefined;
     new Setting(this.contentEl).setName("Title").addText((t) => {
       titleInput = t;
-      t.setPlaceholder("e.g. The Starry Night (1889)").onChange((v) => {
-        this.title = v;
-        this.renderInfo();
-        this.renderYaml();
-      });
+      t.setPlaceholder("e.g. The Starry Night (1889)")
+        .setValue(this.title)
+        .onChange((v) => {
+          this.title = v;
+          this.renderInfo();
+          this.renderYaml();
+        });
       t.inputEl.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") void this.create();
+        if (e.key === "Enter") void this.submit();
       });
     });
     this.infoEl = this.contentEl.createDiv({ cls: "vaultsmith-info" });
@@ -63,10 +98,10 @@ export class NoteModal extends Modal {
     this.errorEl = this.contentEl.createDiv({ cls: "vaultsmith-error" });
     new Setting(this.contentEl)
       .addButton((b) => b.setButtonText("Cancel").onClick(() => this.close()))
-      .addButton((b) => b.setButtonText("Create note").setCta().onClick(() => void this.create()));
+      .addButton((b) => b.setButtonText(this.file ? "Save" : "Create note").setCta().onClick(() => void this.submit()));
 
     this.render();
-    window.setTimeout(() => titleInput?.inputEl.focus(), 0);
+    if (!this.file) window.setTimeout(() => titleInput?.inputEl.focus(), 0);
   }
 
   onClose(): void {
@@ -85,7 +120,8 @@ export class NoteModal extends Modal {
   private render(focusField?: string): void {
     this.formEl.empty();
     this.renderType();
-    this.renderLocation();
+    if (this.edit) this.renderEditLocation();
+    else this.renderLocation();
     this.renderFields();
     this.renderInfo();
     if (focusField) this.formEl.querySelector<HTMLInputElement>(`input[data-field="${focusField}"]`)?.focus();
@@ -100,7 +136,7 @@ export class NoteModal extends Modal {
       if (options.length === 0) break;
       const chosen = this.path[level];
       setting.addDropdown((d) => {
-        d.addOption("", level === 0 ? "Choose…" : parent.abstract ? "Choose…" : "—");
+        d.addOption("", level === 0 || parent.abstract ? "Choose…" : "—");
         for (const s of options) d.addOption(s.id, s.label);
         d.setValue(chosen ?? "");
         d.onChange((v) => {
@@ -126,9 +162,28 @@ export class NoteModal extends Modal {
         this.folderManual = true;
       });
     });
+    this.renderTemplateDropdown();
+  }
 
+  private renderEditLocation(): void {
+    const edit = this.edit!;
+    const target = this.schemaId ? folderOf(this.config, this.schemaId) : undefined;
+    if (target !== undefined && target !== edit.folder) {
+      new Setting(this.formEl)
+        .setName("Move to default folder")
+        .setDesc(`${edit.folder || "(vault root)"} → ${target}`)
+        .addToggle((t) =>
+          t.setValue(this.moveToDefault).onChange((v) => (this.moveToDefault = v)),
+        );
+    }
+    if (edit.bodyEmpty) this.renderTemplateDropdown("The note is empty, so the template body is inserted.");
+  }
+
+  private renderTemplateDropdown(desc?: string): void {
     const templates = listTemplates(this.app, this.plugin.settings.templatesFolder);
-    new Setting(this.formEl).setName("Template").addDropdown((d) => {
+    const setting = new Setting(this.formEl).setName("Template");
+    if (desc) setting.setDesc(desc);
+    setting.addDropdown((d) => {
       d.addOption("", "None");
       for (const t of templates) d.addOption(t, t);
       if (this.template && !templates.includes(this.template)) d.addOption(this.template, `${this.template} (missing)`);
@@ -175,7 +230,13 @@ export class NoteModal extends Modal {
       set: (name, value, rerender) => {
         this.values[name] = value;
         if (rerender) this.render(name);
-        else this.renderYaml();
+        else {
+          this.renderYaml();
+          this.renderInfo();
+        }
+      },
+      refresh: () => {
+        if (this.contentEl.isConnected) this.render();
       },
       createValue: (field, typed) => this.createValue(field, typed),
     };
@@ -199,12 +260,17 @@ export class NoteModal extends Modal {
     });
   }
 
-  /** File name, aliases and frontmatter as they would be created. */
+  private renamed(fileName: string): boolean {
+    return !!this.edit && fileName !== "" && fileName !== this.edit.file.basename;
+  }
+
+  /** File name, aliases and frontmatter as they would be written. */
   private draft() {
     const { fileName, changed } = sanitizeTitle(this.title);
     const values = { ...this.values };
-    const aliases = Array.isArray(values.aliases) ? [...(values.aliases as string[])] : [];
+    let aliases = Array.isArray(values.aliases) ? (values.aliases as unknown[]).map(String) : [];
     if (changed && this.title.trim() && !aliases.includes(this.title.trim())) aliases.push(this.title.trim());
+    if (this.edit && this.renamed(fileName)) aliases = aliasesAfterRename(aliases, this.edit.file.basename, fileName, this.keepOldTitle);
     values.aliases = aliases;
     const id = this.schemaId;
     const fm = id ? buildFrontmatter(this.config, id, values) : {};
@@ -214,13 +280,29 @@ export class NoteModal extends Modal {
   private duplicates(): Duplicate[] {
     const { fileName, aliases } = this.draft();
     if (!fileName) return [];
-    return findDuplicates([fileName, this.title, ...aliases], this.notes);
+    const names = this.edit ? [fileName, ...(this.renamed(fileName) ? [this.title] : [])] : [fileName, this.title, ...aliases];
+    return findDuplicates(names, this.notes);
   }
 
   private renderInfo(): void {
     this.infoEl.empty();
-    const { fileName } = this.draft();
+    const { fileName, fm } = this.draft();
+    const edit = this.edit;
+    if (edit?.detection?.unknown) {
+      const { field, value } = edit.detection.unknown;
+      this.infoEl.createDiv({ cls: "vaultsmith-warning", text: `Unknown ${field} "${String(value)}". Pick a type below.` });
+    }
     if (fileName && fileName !== this.title.trim()) this.infoEl.createDiv({ text: `File name: ${fileName}.md (original title is kept as alias)` });
+    if (edit && this.renamed(fileName)) {
+      const row = this.infoEl.createEl("label", { cls: "vaultsmith-rename" });
+      const box = row.createEl("input", { type: "checkbox" });
+      box.checked = this.keepOldTitle;
+      box.addEventListener("change", () => {
+        this.keepOldTitle = box.checked;
+        this.renderYaml();
+      });
+      row.appendText(` Rename to "${fileName}" and keep "${edit.file.basename}" as alias`);
+    }
     for (const dup of this.duplicates()) {
       const row = this.infoEl.createDiv({ cls: "vaultsmith-warning" });
       row.appendText(`Already exists: ${dup.note.basename}${dup.matched !== dup.note.basename ? ` (alias "${dup.matched}")` : ""} `);
@@ -231,59 +313,97 @@ export class NoteModal extends Modal {
         this.close();
       });
     }
+    if (edit && this.schemaId) {
+      const removed = removedKeys(this.config, edit.fm, fm);
+      if (removed.length) this.infoEl.createDiv({ cls: "vaultsmith-removed", text: `Will be removed: ${removed.join(", ")}` });
+    }
   }
 
   private renderYaml(): void {
     if (this.yamlEl) this.yamlEl.setText(stringifyYaml(this.draft().fm));
   }
 
-  private async create(): Promise<void> {
-    if (this.busy) return;
-    this.errorEl.empty();
-    const fail = (msg: string) => {
-      this.errorEl.setText(msg);
-    };
+  /** Checks shared by create and save. Returns an error message or null. */
+  private problem(): string | null {
     const id = this.schemaId;
     const schema = id ? this.config.schemas.get(id) : undefined;
-    const { fileName, fm } = this.draft();
-    if (!fileName) return fail("Enter a title.");
-    if (!id || !schema) return fail("Choose a type.");
-    if (schema.abstract) return fail(`Choose a subtype of ${schema.label}.`);
+    if (!this.draft().fileName) return "Enter a title.";
+    if (!id || !schema) return "Choose a type.";
+    if (schema.abstract) return `Choose a subtype of ${schema.label}.`;
     const missing = missingRequired(this.config, id, this.values);
-    if (missing.length) return fail(`Required: ${missing.map((f) => f.label).join(", ")}.`);
-    if (this.duplicates().length) return fail("A note with this name or alias already exists. Change the title or open the existing note.");
+    if (missing.length) return `Required: ${missing.map((f) => f.label).join(", ")}.`;
+    if (this.duplicates().length) return "A note with this name or alias already exists. Change the title or open the existing note.";
+    return null;
+  }
 
-    let body = "";
-    let templateFm: Record<string, unknown> | null = null;
-    if (this.template) {
-      const text = await readTemplate(this.app, this.template);
-      if (text === null) return fail(`Template not found: ${this.template}`);
-      const split = splitFrontmatter(text);
-      body = fillPlaceholders(split.body, fileName, (p) => window.moment().format(p));
-      try {
-        templateFm = split.yaml ? ((parseYaml(split.yaml) as Record<string, unknown> | null) ?? null) : null;
-      } catch (e) {
-        return fail(`Template frontmatter is not valid YAML: ${(e as Error).message}`);
-      }
+  /** Template body (placeholders filled) and frontmatter; error message as string. */
+  private async loadTemplate(title: string): Promise<{ body: string; fm: Record<string, unknown> | null } | string> {
+    if (!this.template) return { body: "", fm: null };
+    const text = await readTemplate(this.app, this.template);
+    if (text === null) return `Template not found: ${this.template}`;
+    const split = splitFrontmatter(text);
+    try {
+      const fm = split.yaml ? ((parseYaml(split.yaml) as Record<string, unknown> | null) ?? null) : null;
+      return { body: fillPlaceholders(split.body, title, (p) => window.moment().format(p)), fm };
+    } catch (e) {
+      return `Template frontmatter is not valid YAML: ${(e as Error).message}`;
     }
+  }
 
-    const folder = this.folder ? normalizePath(this.folder) : "";
-    const path = normalizePath(folder ? `${folder}/${fileName}.md` : `${fileName}.md`);
-    const content = `---\n${stringifyYaml(mergeFrontmatter(fm, templateFm))}---\n${body}`;
-
+  private async submit(): Promise<void> {
+    if (this.busy) return;
+    this.errorEl.empty();
+    const problem = this.problem();
+    if (problem) return void this.errorEl.setText(problem);
     this.busy = true;
     try {
-      await ensureFolder(this.app, folder);
-      const file = await this.app.vault.create(path, content);
-      this.plugin.settings.lastSchema = id;
-      await this.plugin.saveSettings();
-      this.close();
-      await this.app.workspace.getLeaf(false).openFile(file);
+      await (this.edit ? this.save(this.edit) : this.create());
     } catch (e) {
-      fail(`Could not create the note: ${(e as Error).message}`);
+      this.errorEl.setText(`Could not ${this.edit ? "save" : "create"} the note: ${(e as Error).message}`);
     } finally {
       this.busy = false;
     }
+  }
+
+  private async create(): Promise<void> {
+    const { fileName, fm } = this.draft();
+    const template = await this.loadTemplate(fileName);
+    if (typeof template === "string") return void this.errorEl.setText(template);
+
+    const folder = this.folder ? normalizePath(this.folder) : "";
+    const path = normalizePath(folder ? `${folder}/${fileName}.md` : `${fileName}.md`);
+    const content = `---\n${stringifyYaml(mergeFrontmatter(fm, template.fm))}---\n${template.body}`;
+
+    await ensureFolder(this.app, folder);
+    const file = await this.app.vault.create(path, content);
+    this.plugin.settings.lastSchema = this.schemaId;
+    await this.plugin.saveSettings();
+    this.close();
+    await this.app.workspace.getLeaf(false).openFile(file);
+  }
+
+  private async save(edit: EditState): Promise<void> {
+    const { fileName, fm } = this.draft();
+    const template = edit.bodyEmpty ? await this.loadTemplate(fileName) : { body: "", fm: null };
+    if (typeof template === "string") return void this.errorEl.setText(template);
+
+    const removed = removedKeys(this.config, edit.fm, fm);
+    await this.app.fileManager.processFrontMatter(edit.file, (current: Record<string, unknown>) => {
+      for (const key of removed) delete current[key];
+      Object.assign(current, fm);
+      for (const [k, v] of Object.entries(template.fm ?? {})) if (!(k in current)) current[k] = v;
+    });
+    if (template.body) await this.app.vault.process(edit.file, (text) => `${text.replace(/\s*$/, "\n")}${template.body}`);
+
+    const target = this.schemaId ? folderOf(this.config, this.schemaId) : undefined;
+    const folder = this.moveToDefault && target !== undefined ? normalizePath(target) : edit.folder;
+    const path = normalizePath(folder ? `${folder}/${fileName}.md` : `${fileName}.md`);
+    if (path !== edit.file.path) {
+      await ensureFolder(this.app, folder);
+      await this.app.fileManager.renameFile(edit.file, path);
+    }
+    this.close();
+    new Notice(`Saved ${fileName}`);
   }
 }
 
@@ -293,4 +413,12 @@ export function openNewNote(plugin: VaultsmithPlugin): void {
     return;
   }
   new NoteModal(plugin, plugin.config).open();
+}
+
+export function openEditNote(plugin: VaultsmithPlugin, file: TFile): void {
+  if (!plugin.config) {
+    new Notice('Vaultsmith: no valid configuration. Run "Check configuration".');
+    return;
+  }
+  new NoteModal(plugin, plugin.config, file).open();
 }
