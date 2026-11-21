@@ -1,0 +1,35 @@
+{
+  "id": "common",
+  "label": "Note",
+  "abstract": true,
+  "subtypeField": "type",
+  "fields": [
+    {
+      "name": "domains",
+      "label": "Domains",
+      "type": "choice",
+      "catalog": "domains",
+      "multiple": true,
+      "required": true
+    },
+    {
+      "name": "status",
+      "label": "Status",
+      "type": "choice",
+      "catalog": "statuses",
+      "default": "to_write",
+      "required": true
+    },
+    {
+      "name": "aliases",
+      "label": "Aliases",
+      "type": "list"
+    },
+    {
+      "name": "related",
+      "label": "Related",
+      "type": "link",
+      "multiple": true
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "vaultsmith",
+  "name": "Vaultsmith",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Create and edit structured notes from your own schemas and catalogs.",
+  "author": "NihadCommits",
+  "authorUrl": "https://github.com/NihadCommits",
+  "isDesktopOnly": true
+}

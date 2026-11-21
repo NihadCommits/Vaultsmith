@@ -1,0 +1,6 @@
+{
+  "id": "process",
+  "label": "Process",
+  "extends": "concept",
+  "template": "Templates/Concepts/Process.md"
+}

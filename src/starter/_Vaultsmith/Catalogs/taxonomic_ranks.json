@@ -1,0 +1,62 @@
+{
+  "id": "taxonomic_ranks",
+  "label": "Taxonomic ranks",
+  "values": [
+    {
+      "id": "domain",
+      "label": "Domain",
+      "aliases": [
+        "Domäne"
+      ]
+    },
+    {
+      "id": "kingdom",
+      "label": "Kingdom",
+      "aliases": [
+        "Reich"
+      ]
+    },
+    {
+      "id": "phylum",
+      "label": "Phylum",
+      "aliases": [
+        "Stamm"
+      ]
+    },
+    {
+      "id": "class",
+      "label": "Class",
+      "aliases": [
+        "Klasse"
+      ]
+    },
+    {
+      "id": "order",
+      "label": "Order",
+      "aliases": [
+        "Ordnung"
+      ]
+    },
+    {
+      "id": "family",
+      "label": "Family",
+      "aliases": [
+        "Familie"
+      ]
+    },
+    {
+      "id": "genus",
+      "label": "Genus",
+      "aliases": [
+        "Gattung"
+      ]
+    },
+    {
+      "id": "species",
+      "label": "Species",
+      "aliases": [
+        "Art"
+      ]
+    }
+  ]
+}

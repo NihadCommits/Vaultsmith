@@ -1,0 +1,5 @@
+{
+  "id": "group",
+  "label": "Group",
+  "extends": "entity"
+}

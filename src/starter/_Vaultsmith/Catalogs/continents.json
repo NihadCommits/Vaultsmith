@@ -1,0 +1,56 @@
+{
+  "id": "continents",
+  "label": "Continents",
+  "values": [
+    {
+      "id": "africa",
+      "label": "Africa",
+      "aliases": [
+        "Afrika"
+      ]
+    },
+    {
+      "id": "antarctica",
+      "label": "Antarctica",
+      "aliases": [
+        "Antarktis"
+      ]
+    },
+    {
+      "id": "asia",
+      "label": "Asia",
+      "aliases": [
+        "Asien"
+      ]
+    },
+    {
+      "id": "europe",
+      "label": "Europe",
+      "aliases": [
+        "Europa"
+      ]
+    },
+    {
+      "id": "north_america",
+      "label": "North America",
+      "aliases": [
+        "Nordamerika"
+      ]
+    },
+    {
+      "id": "oceania",
+      "label": "Oceania",
+      "aliases": [
+        "Ozeanien",
+        "Australien"
+      ]
+    },
+    {
+      "id": "south_america",
+      "label": "South America",
+      "aliases": [
+        "Südamerika"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "map",
+  "label": "Map",
+  "extends": "common",
+  "defaultFolder": "20 Knowledge/03 - Maps",
+  "template": "Templates/Maps/Map.md"
+}

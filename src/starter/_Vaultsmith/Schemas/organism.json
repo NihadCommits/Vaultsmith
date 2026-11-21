@@ -1,0 +1,7 @@
+{
+  "id": "organism",
+  "label": "Organism",
+  "extends": "entity",
+  "subtypeField": "organism_type",
+  "template": "Templates/Entities/Organism.md"
+}

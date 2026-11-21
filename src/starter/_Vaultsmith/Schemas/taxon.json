@@ -1,0 +1,18 @@
+{
+  "id": "taxon",
+  "label": "Taxon",
+  "extends": "organism",
+  "fields": [
+    {
+      "name": "scientific_name",
+      "label": "Scientific name",
+      "type": "text"
+    },
+    {
+      "name": "taxonomic_rank",
+      "label": "Taxonomic rank",
+      "type": "choice",
+      "catalog": "taxonomic_ranks"
+    }
+  ]
+}

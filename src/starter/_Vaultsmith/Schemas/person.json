@@ -1,0 +1,25 @@
+{
+  "id": "person",
+  "label": "Person",
+  "extends": "entity",
+  "template": "Templates/Entities/Person.md",
+  "fields": [
+    {
+      "name": "birth_date",
+      "label": "Birth date",
+      "type": "date"
+    },
+    {
+      "name": "death_date",
+      "label": "Death date",
+      "type": "date"
+    },
+    {
+      "name": "occupations",
+      "label": "Occupations",
+      "type": "choice",
+      "catalog": "occupations",
+      "multiple": true
+    }
+  ]
+}

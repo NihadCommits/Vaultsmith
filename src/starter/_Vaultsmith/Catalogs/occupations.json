@@ -1,0 +1,111 @@
+{
+  "id": "occupations",
+  "label": "Occupations",
+  "values": [
+    {
+      "id": "physicist",
+      "label": "Physicist",
+      "aliases": [
+        "Physiker",
+        "Physikerin"
+      ]
+    },
+    {
+      "id": "chemist",
+      "label": "Chemist",
+      "aliases": [
+        "Chemiker",
+        "Chemikerin"
+      ]
+    },
+    {
+      "id": "biologist",
+      "label": "Biologist",
+      "aliases": [
+        "Biologe",
+        "Biologin"
+      ]
+    },
+    {
+      "id": "mathematician",
+      "label": "Mathematician",
+      "aliases": [
+        "Mathematiker",
+        "Mathematikerin"
+      ]
+    },
+    {
+      "id": "engineer",
+      "label": "Engineer",
+      "aliases": [
+        "Ingenieur",
+        "Ingenieurin"
+      ]
+    },
+    {
+      "id": "physician",
+      "label": "Physician",
+      "aliases": [
+        "Arzt",
+        "Ärztin"
+      ]
+    },
+    {
+      "id": "painter",
+      "label": "Painter",
+      "aliases": [
+        "Maler",
+        "Malerin"
+      ]
+    },
+    {
+      "id": "writer",
+      "label": "Writer",
+      "aliases": [
+        "Schriftsteller",
+        "Schriftstellerin",
+        "Autor"
+      ]
+    },
+    {
+      "id": "composer",
+      "label": "Composer",
+      "aliases": [
+        "Komponist",
+        "Komponistin"
+      ]
+    },
+    {
+      "id": "musician",
+      "label": "Musician",
+      "aliases": [
+        "Musiker",
+        "Musikerin"
+      ]
+    },
+    {
+      "id": "philosopher",
+      "label": "Philosopher",
+      "aliases": [
+        "Philosoph",
+        "Philosophin"
+      ]
+    },
+    {
+      "id": "historian",
+      "label": "Historian",
+      "aliases": [
+        "Historiker",
+        "Historikerin"
+      ]
+    },
+    {
+      "id": "politician",
+      "label": "Politician",
+      "aliases": [
+        "Politiker",
+        "Politikerin"
+      ]
+    }
+  ]
+}

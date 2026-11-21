@@ -1,0 +1,19 @@
+{
+  "id": "event",
+  "label": "Event",
+  "extends": "entity",
+  "subtypeField": "event_type",
+  "template": "Templates/Entities/Event.md",
+  "fields": [
+    {
+      "name": "start_year",
+      "label": "Start year",
+      "type": "number"
+    },
+    {
+      "name": "end_year",
+      "label": "End year",
+      "type": "number"
+    }
+  ]
+}

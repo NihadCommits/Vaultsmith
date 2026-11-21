@@ -1,0 +1,8 @@
+{
+  "id": "topic",
+  "label": "Topic",
+  "extends": "common",
+  "subtypeField": "topic_type",
+  "defaultFolder": "20 Knowledge/01 - Concepts & Topics/01 - Topics",
+  "template": "Templates/Topics/Topic.md"
+}

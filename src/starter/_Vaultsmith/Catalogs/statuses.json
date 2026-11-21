@@ -1,0 +1,61 @@
+{
+  "id": "statuses",
+  "label": "Status",
+  "values": [
+    {
+      "id": "to_write",
+      "label": "To write",
+      "aliases": [
+        "zu schreiben",
+        "todo",
+        "neu",
+        "idee"
+      ],
+      "description": "Captured to remember. Nothing written yet."
+    },
+    {
+      "id": "researching",
+      "label": "Researching",
+      "aliases": [
+        "recherche",
+        "lesen",
+        "quellen"
+      ],
+      "color": "blue",
+      "description": "Collecting and reading sources, explaining on paper."
+    },
+    {
+      "id": "writing",
+      "label": "Writing",
+      "aliases": [
+        "schreiben",
+        "entwurf",
+        "in arbeit"
+      ],
+      "color": "orange",
+      "description": "Your own explanation is being written."
+    },
+    {
+      "id": "needs_review",
+      "label": "Needs review",
+      "aliases": [
+        "überprüfen",
+        "prüfen",
+        "review"
+      ],
+      "color": "purple",
+      "description": "Written, but has a gap, a doubt or a new source."
+    },
+    {
+      "id": "finished",
+      "label": "Finished",
+      "aliases": [
+        "fertig",
+        "done",
+        "abgeschlossen"
+      ],
+      "color": "green",
+      "description": "Complete for now."
+    }
+  ]
+}

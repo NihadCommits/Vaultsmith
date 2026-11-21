@@ -1,0 +1,6 @@
+{
+  "id": "medical_condition",
+  "label": "Medical condition",
+  "extends": "topic",
+  "template": "Templates/Topics/Medical condition.md"
+}

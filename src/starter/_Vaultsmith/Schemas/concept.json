@@ -1,0 +1,8 @@
+{
+  "id": "concept",
+  "label": "Concept",
+  "extends": "common",
+  "subtypeField": "concept_type",
+  "defaultFolder": "20 Knowledge/01 - Concepts & Topics/02 - Concepts",
+  "template": "Templates/Concepts/Concept.md"
+}

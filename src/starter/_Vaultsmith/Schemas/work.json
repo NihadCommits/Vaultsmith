@@ -1,0 +1,6 @@
+{
+  "id": "work",
+  "label": "Work",
+  "extends": "entity",
+  "subtypeField": "work_type"
+}

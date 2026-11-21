@@ -1,0 +1,42 @@
+{
+  "id": "painting",
+  "label": "Painting",
+  "extends": "work",
+  "template": "Templates/Entities/Painting.md",
+  "fields": [
+    {
+      "name": "artist",
+      "label": "Artist",
+      "type": "link",
+      "target": "person"
+    },
+    {
+      "name": "creation_year",
+      "label": "Creation year",
+      "type": "number"
+    },
+    {
+      "name": "art_movement",
+      "label": "Art movement",
+      "type": "link",
+      "target": "topic"
+    },
+    {
+      "name": "medium",
+      "label": "Medium",
+      "type": "choice",
+      "catalog": "art_media"
+    },
+    {
+      "name": "dimensions",
+      "label": "Dimensions",
+      "type": "text"
+    },
+    {
+      "name": "current_location",
+      "label": "Current location",
+      "type": "link",
+      "target": "place"
+    }
+  ]
+}

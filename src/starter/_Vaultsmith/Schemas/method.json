@@ -1,0 +1,6 @@
+{
+  "id": "method",
+  "label": "Method",
+  "extends": "concept",
+  "template": "Templates/Concepts/Method.md"
+}

@@ -1,0 +1,42 @@
+filters:
+  and:
+    - file.hasProperty("status")
+    - not:
+        - file.inFolder("90 Archive")
+views:
+  - type: kanban
+    name: Board
+    groupBy:
+      property: note.status
+      direction: ASC
+    groupOrder:
+      - to_write
+      - researching
+      - writing
+      - needs_review
+      - finished
+  - type: table
+    name: To write
+    filters:
+      and:
+        - 'status == "to_write"'
+    order:
+      - file.name
+      - aliases
+      - type
+      - domains
+      - file.ctime
+  - type: table
+    name: In progress
+    filters:
+      and:
+        - '["researching", "writing", "needs_review"].contains(status)'
+    groupBy:
+      property: note.status
+      direction: ASC
+    order:
+      - file.name
+      - aliases
+      - status
+      - domains
+      - file.mtime

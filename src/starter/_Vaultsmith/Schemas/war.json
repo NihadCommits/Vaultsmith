@@ -1,0 +1,5 @@
+{
+  "id": "war",
+  "label": "War",
+  "extends": "event"
+}

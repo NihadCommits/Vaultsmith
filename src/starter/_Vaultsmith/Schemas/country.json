@@ -1,0 +1,18 @@
+{
+  "id": "country",
+  "label": "Country",
+  "extends": "place",
+  "fields": [
+    {
+      "name": "country_code",
+      "label": "Country code",
+      "type": "text"
+    },
+    {
+      "name": "continent",
+      "label": "Continent",
+      "type": "choice",
+      "catalog": "continents"
+    }
+  ]
+}

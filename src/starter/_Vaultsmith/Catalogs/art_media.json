@@ -1,0 +1,66 @@
+{
+  "id": "art_media",
+  "label": "Art media",
+  "values": [
+    {
+      "id": "oil_on_canvas",
+      "label": "Oil on canvas",
+      "aliases": [
+        "Öl auf Leinwand"
+      ]
+    },
+    {
+      "id": "oil_on_panel",
+      "label": "Oil on panel",
+      "aliases": [
+        "Öl auf Holz"
+      ]
+    },
+    {
+      "id": "watercolor",
+      "label": "Watercolor",
+      "aliases": [
+        "Aquarell"
+      ]
+    },
+    {
+      "id": "acrylic",
+      "label": "Acrylic",
+      "aliases": [
+        "Acryl"
+      ]
+    },
+    {
+      "id": "tempera",
+      "label": "Tempera"
+    },
+    {
+      "id": "fresco",
+      "label": "Fresco",
+      "aliases": [
+        "Fresko"
+      ]
+    },
+    {
+      "id": "ink",
+      "label": "Ink",
+      "aliases": [
+        "Tusche"
+      ]
+    },
+    {
+      "id": "charcoal",
+      "label": "Charcoal",
+      "aliases": [
+        "Kohle"
+      ]
+    },
+    {
+      "id": "mixed_media",
+      "label": "Mixed media",
+      "aliases": [
+        "Mischtechnik"
+      ]
+    }
+  ]
+}

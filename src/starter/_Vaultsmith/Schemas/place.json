@@ -1,0 +1,7 @@
+{
+  "id": "place",
+  "label": "Place",
+  "extends": "entity",
+  "subtypeField": "place_type",
+  "template": "Templates/Entities/Place.md"
+}

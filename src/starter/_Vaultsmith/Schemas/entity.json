@@ -1,0 +1,9 @@
+{
+  "id": "entity",
+  "label": "Entity",
+  "extends": "common",
+  "abstract": true,
+  "subtypeField": "entity_type",
+  "defaultFolder": "20 Knowledge/02 - Entities",
+  "template": "Templates/Entities/Entity.md"
+}

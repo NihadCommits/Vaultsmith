@@ -1,0 +1,178 @@
+{
+  "id": "domains",
+  "label": "Domains",
+  "values": [
+    {
+      "id": "physics",
+      "label": "Physics",
+      "aliases": [
+        "Physik"
+      ]
+    },
+    {
+      "id": "chemistry",
+      "label": "Chemistry",
+      "aliases": [
+        "Chemie"
+      ]
+    },
+    {
+      "id": "biology",
+      "label": "Biology",
+      "aliases": [
+        "Biologie"
+      ],
+      "description": "Living things in general. Use nature for ecosystems and wildlife."
+    },
+    {
+      "id": "medicine",
+      "label": "Medicine",
+      "aliases": [
+        "Medizin"
+      ]
+    },
+    {
+      "id": "mathematics",
+      "label": "Mathematics",
+      "aliases": [
+        "Mathematik",
+        "Maths",
+        "Math"
+      ]
+    },
+    {
+      "id": "technology",
+      "label": "Technology",
+      "aliases": [
+        "Technik"
+      ]
+    },
+    {
+      "id": "history",
+      "label": "History",
+      "aliases": [
+        "Geschichte"
+      ]
+    },
+    {
+      "id": "geography",
+      "label": "Geography",
+      "aliases": [
+        "Geografie",
+        "Geographie"
+      ]
+    },
+    {
+      "id": "nature",
+      "label": "Nature",
+      "aliases": [
+        "Natur"
+      ],
+      "description": "Ecosystems, landscapes, wildlife in the field."
+    },
+    {
+      "id": "arts",
+      "label": "Arts",
+      "aliases": [
+        "Kunst"
+      ],
+      "description": "Making and looking at art."
+    },
+    {
+      "id": "art_history",
+      "label": "Art history",
+      "aliases": [
+        "Kunstgeschichte"
+      ],
+      "description": "Movements, periods and the history of art."
+    },
+    {
+      "id": "music",
+      "label": "Music",
+      "aliases": [
+        "Musik"
+      ]
+    },
+    {
+      "id": "literature",
+      "label": "Literature",
+      "aliases": [
+        "Literatur"
+      ]
+    },
+    {
+      "id": "philosophy",
+      "label": "Philosophy",
+      "aliases": [
+        "Philosophie"
+      ]
+    },
+    {
+      "id": "religion",
+      "label": "Religion",
+      "aliases": [
+        "Religionen",
+        "Glaube"
+      ]
+    },
+    {
+      "id": "esotericism",
+      "label": "Esotericism",
+      "aliases": [
+        "Esoterik",
+        "Mystik"
+      ]
+    },
+    {
+      "id": "economics",
+      "label": "Economics",
+      "aliases": [
+        "Wirtschaft"
+      ]
+    },
+    {
+      "id": "politics",
+      "label": "Politics",
+      "aliases": [
+        "Politik"
+      ]
+    },
+    {
+      "id": "society",
+      "label": "Society",
+      "aliases": [
+        "Gesellschaft"
+      ],
+      "description": "How people live together: groups, norms, social change."
+    },
+    {
+      "id": "culture",
+      "label": "Culture",
+      "aliases": [
+        "Kultur"
+      ],
+      "description": "Customs, traditions, everyday culture."
+    },
+    {
+      "id": "computer_science",
+      "label": "Computer science",
+      "aliases": [
+        "Informatik"
+      ]
+    },
+    {
+      "id": "astronomy",
+      "label": "Astronomy",
+      "aliases": [
+        "Astronomie"
+      ]
+    },
+    {
+      "id": "geology",
+      "label": "Geology",
+      "aliases": [
+        "Geologie"
+      ]
+    }
+  ]
+}
