@@ -3,10 +3,14 @@ import type VaultsmithPlugin from "./main";
 
 export interface VaultsmithSettings {
   configFolder: string;
+  templatesFolder: string;
+  /** Type preselected in "New note". */
+  lastSchema?: string;
 }
 
 export const DEFAULT_SETTINGS: VaultsmithSettings = {
   configFolder: "_Vaultsmith",
+  templatesFolder: "Templates",
 };
 
 export class VaultsmithSettingTab extends PluginSettingTab {
@@ -28,6 +32,18 @@ export class VaultsmithSettingTab extends PluginSettingTab {
             this.plugin.settings.configFolder = value.trim() || DEFAULT_SETTINGS.configFolder;
             await this.plugin.saveSettings();
             this.plugin.scheduleReload();
+          }),
+      );
+    new Setting(containerEl)
+      .setName("Templates folder")
+      .setDesc('Markdown files offered in the "Template" dropdown.')
+      .addText((text) =>
+        text
+          .setPlaceholder(DEFAULT_SETTINGS.templatesFolder)
+          .setValue(this.plugin.settings.templatesFolder)
+          .onChange(async (value) => {
+            this.plugin.settings.templatesFolder = value.trim() || DEFAULT_SETTINGS.templatesFolder;
+            await this.plugin.saveSettings();
           }),
       );
   }

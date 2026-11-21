@@ -59,6 +59,8 @@ export interface Issue {
 export interface Config {
   schemas: Map<string, SchemaDef>;
   catalogs: Map<string, CatalogDef>;
+  /** Vault path of each catalog file, for writing new values. */
+  catalogPaths: Map<string, string>;
   root: SchemaDef;
   /** Direct subtypes per schema id, in load order. */
   children: Map<string, SchemaDef[]>;

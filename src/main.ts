@@ -3,6 +3,7 @@ import { buildConfig } from "./core/validate";
 import type { Config, Issue } from "./core/types";
 import { DEFAULT_SETTINGS, VaultsmithSettingTab, type VaultsmithSettings } from "./settings";
 import { IssuesModal } from "./ui/IssuesModal";
+import { openNewNote } from "./ui/NoteModal";
 import { pathExists, readConfigFiles } from "./vault/config";
 
 export default class VaultsmithPlugin extends Plugin {
@@ -16,6 +17,8 @@ export default class VaultsmithPlugin extends Plugin {
     await this.loadSettings();
     this.addSettingTab(new VaultsmithSettingTab(this.app, this));
 
+    this.addRibbonIcon("file-plus", "Vaultsmith: New note", () => openNewNote(this));
+    this.addCommand({ id: "new-note", name: "New note", callback: () => openNewNote(this) });
     this.addCommand({
       id: "check-configuration",
       name: "Check configuration",

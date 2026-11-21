@@ -1,0 +1,83 @@
+.vaultsmith-modal {
+  width: min(720px, 92vw);
+}
+
+.vaultsmith-type .setting-item-control {
+  flex-wrap: wrap;
+  gap: var(--size-4-2);
+}
+
+.vaultsmith-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-4-1);
+  max-width: 420px;
+}
+
+.vaultsmith-chip {
+  --vaultsmith-color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--size-2-2);
+  padding: var(--size-2-1) var(--size-4-2);
+  border-radius: var(--radius-l);
+  border: 1px solid var(--vaultsmith-color);
+  background: var(--background-modifier-hover);
+  font-size: var(--font-ui-small);
+}
+
+.vaultsmith-chip.is-invalid {
+  --vaultsmith-color: var(--color-red);
+  color: var(--color-red);
+}
+
+.vaultsmith-chip-remove {
+  padding: 0 var(--size-2-1);
+  height: auto;
+  background: none;
+  box-shadow: none;
+  color: var(--text-muted);
+}
+
+.vaultsmith-chip-input {
+  flex: 1 1 120px;
+  min-width: 120px;
+}
+
+.vaultsmith-toggle {
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: var(--size-4-2) 0;
+  user-select: none;
+}
+
+.vaultsmith-toggle:hover {
+  color: var(--text-normal);
+}
+
+.vaultsmith-yaml {
+  font-size: var(--font-ui-small);
+  background: var(--background-secondary);
+  padding: var(--size-4-2);
+  border-radius: var(--radius-s);
+  white-space: pre-wrap;
+}
+
+.vaultsmith-info {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.vaultsmith-warning {
+  color: var(--color-orange);
+}
+
+.vaultsmith-error {
+  color: var(--color-red);
+}
+
+.vaultsmith-suggest-note {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}

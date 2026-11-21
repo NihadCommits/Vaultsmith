@@ -180,5 +180,5 @@ export function buildConfig(
     if (s.extends === undefined) continue;
     children.set(s.extends, [...(children.get(s.extends) ?? []), s]);
   }
-  return { config: { schemas, catalogs, root: roots[0], children }, issues };
+  return { config: { schemas, catalogs, catalogPaths: catalogFile, root: roots[0], children }, issues };
 }
