@@ -2,7 +2,7 @@ import { normalizePath, TFile, TFolder, type App } from "obsidian";
 import type { NoteInfo } from "../core/notes";
 import { aliasesOf } from "../core/notes";
 import { detectSchema } from "../core/resolve";
-import type { CatalogValue, Config } from "../core/types";
+import type { CatalogDef, CatalogValue, Config } from "../core/types";
 
 /** All notes with aliases and detected type, straight from Obsidian's metadata cache (no own index). */
 export function listNotes(app: App, config: Config): NoteInfo[] {
@@ -49,6 +49,25 @@ export async function ensureFolder(app: App, folder: string): Promise<void> {
 export async function readTemplate(app: App, path: string): Promise<string | null> {
   const file = app.vault.getAbstractFileByPath(normalizePath(path));
   return file instanceof TFile ? app.vault.read(file) : null;
+}
+
+/** Every markdown note with its frontmatter (empty object if none). */
+export function allFrontmatter(app: App): { file: TFile; fm: Record<string, unknown> }[] {
+  return app.vault.getMarkdownFiles().map((file) => ({
+    file,
+    fm: (app.metadataCache.getFileCache(file)?.frontmatter ?? {}) as Record<string, unknown>,
+  }));
+}
+
+/** Replaces the values of a catalog file; other keys in the file are kept. */
+export async function writeCatalog(app: App, catalogPath: string, catalog: CatalogDef): Promise<void> {
+  const file = app.vault.getAbstractFileByPath(catalogPath);
+  if (!(file instanceof TFile)) throw new Error(`${catalogPath} not found`);
+  await app.vault.process(file, (text) => {
+    const data = JSON.parse(text) as Record<string, unknown>;
+    data.values = catalog.values;
+    return JSON.stringify(data, null, 2) + "\n";
+  });
 }
 
 /** Appends a value to a catalog JSON file, keeping the rest of the file as is. */

@@ -1,5 +1,6 @@
 import { PluginSettingTab, Setting, type App } from "obsidian";
 import type VaultsmithPlugin from "./main";
+import { CatalogEditor } from "./ui/CatalogEditor";
 
 export interface VaultsmithSettings {
   configFolder: string;
@@ -17,8 +18,11 @@ export const DEFAULT_SETTINGS: VaultsmithSettings = {
 };
 
 export class VaultsmithSettingTab extends PluginSettingTab {
+  private catalogs: CatalogEditor;
+
   constructor(app: App, private plugin: VaultsmithPlugin) {
     super(app, plugin);
+    this.catalogs = new CatalogEditor(plugin, () => this.display());
   }
 
   display(): void {
@@ -62,5 +66,6 @@ export class VaultsmithSettingTab extends PluginSettingTab {
             this.plugin.scheduleReload();
           }),
       );
+    this.catalogs.render(containerEl);
   }
 }

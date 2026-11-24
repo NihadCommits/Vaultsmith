@@ -6,6 +6,7 @@ import { DEFAULT_SETTINGS, VaultsmithSettingTab, type VaultsmithSettings } from 
 import { IssuesModal } from "./ui/IssuesModal";
 import { openEditNote, openNewNote } from "./ui/NoteModal";
 import { StatusBar, StatusPickerModal } from "./ui/StatusBar";
+import { VaultCheckModal } from "./ui/VaultCheckModal";
 import { pathExists, readConfigFiles } from "./vault/config";
 
 export default class VaultsmithPlugin extends Plugin {
@@ -49,6 +50,14 @@ export default class VaultsmithPlugin extends Plugin {
         if (!this.statusBar?.current()) return false;
         if (!checking) this.pickStatus();
         return true;
+      },
+    });
+    this.addCommand({
+      id: "check-vault",
+      name: "Check vault",
+      callback: () => {
+        if (!this.config) return void new Notice('Vaultsmith: no valid configuration. Run "Check configuration".');
+        new VaultCheckModal(this, this.config).open();
       },
     });
     this.addCommand({
