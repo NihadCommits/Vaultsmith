@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { aliasesAfterRename, managedKeys, removedKeys, valuesFromFrontmatter } from "../src/core/edit";
 import { buildFrontmatter } from "../src/core/frontmatter";
+import { linkCandidates } from "../src/core/notes";
 import { statusInfo, stepStatus } from "../src/core/status";
 import { buildConfig } from "../src/core/validate";
 import { fixtureFrontmatter, starterExists, starterFiles } from "./helpers";
@@ -36,6 +37,22 @@ describe("status", () => {
   it("shows for untyped notes only if they have the property", () => {
     expect(info({ tags: ["x"] })).toBeNull();
     expect(info({ status: "writing" })?.index).toBe(2);
+  });
+});
+
+describe("link candidates", () => {
+  const notes = [
+    { path: "a.md", basename: "Vincent van Gogh", aliases: ["Van Gogh"], schemaId: "person" },
+    { path: "b.md", basename: "Bolivia", aliases: ["Bolivien"], schemaId: "country" },
+    { path: "c.md", basename: "Loose note", aliases: [] },
+  ];
+  it("filters by target subtree", () => {
+    expect(linkCandidates(config, notes, "person").map((n) => n.basename)).toEqual(["Vincent van Gogh"]);
+    expect(linkCandidates(config, notes, "place").map((n) => n.basename)).toEqual(["Bolivia"]);
+    expect(linkCandidates(config, notes, "entity").map((n) => n.basename)).toEqual(["Vincent van Gogh", "Bolivia"]);
+  });
+  it("offers every note without target", () => {
+    expect(linkCandidates(config, notes, undefined)).toHaveLength(3);
   });
 });
 

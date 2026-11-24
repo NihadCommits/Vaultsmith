@@ -1,8 +1,19 @@
+import { isWithin } from "./resolve";
+import type { Config } from "./types";
+
 /** What Vaultsmith needs to know about an existing note. */
 export interface NoteInfo {
   path: string;
   basename: string;
   aliases: string[];
+  /** Detected schema, if the note has a type. */
+  schemaId?: string;
+}
+
+/** Notes a link field may point to: all notes without target, else notes of the target schema or its subtypes. */
+export function linkCandidates(config: Config, notes: NoteInfo[], target: string | undefined): NoteInfo[] {
+  if (target === undefined) return notes;
+  return notes.filter((n) => n.schemaId !== undefined && isWithin(config, n.schemaId, target));
 }
 
 export interface Duplicate {

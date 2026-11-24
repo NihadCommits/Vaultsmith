@@ -1,5 +1,6 @@
-import { AbstractInputSuggest, Setting, type App } from "obsidian";
+import { AbstractInputSuggest, Setting, prepareFuzzySearch, type App } from "obsidian";
 import { findCatalogDuplicate, labelOf, searchCatalog } from "../core/catalog";
+import type { NoteInfo } from "../core/notes";
 import type { CatalogDef, CatalogValue, FieldDef } from "../core/types";
 
 export interface FieldContext {
@@ -12,9 +13,23 @@ export interface FieldContext {
   refresh(): void;
   /** Opens the "Create value" dialog; resolves with the new value or null. */
   createValue(field: FieldDef, typed: string): Promise<CatalogValue | null>;
+  /** Notes this link field may point to. */
+  linkTargets(field: FieldDef): NoteInfo[];
+  linkText(note: NoteInfo): string;
+  schemaLabel(id: string | undefined): string | undefined;
+  /** Label of the type a stub would get, or null if this field can't create stubs. */
+  stubLabel(field: FieldDef): string | null;
+  /** Creates a stub note of the field's target type; resolves with its link text or null. */
+  createStub(field: FieldDef, title: string): Promise<string | null>;
 }
 
 const CREATE = "\u0000create";
+/** Dispatched on chip inputs before saving, so text typed without Enter is kept. */
+export const COMMIT_EVENT = "vaultsmith-commit";
+
+export function flushPendingInputs(container: HTMLElement): void {
+  container.querySelectorAll("input.vaultsmith-chip-input").forEach((el) => el.dispatchEvent(new Event(COMMIT_EVENT)));
+}
 const asList = (v: unknown): string[] => (Array.isArray(v) ? v.map(String) : v === undefined || v === "" ? [] : [String(v)]);
 const unwrapLink = (v: string) => v.replace(/^\[\[(.*)\]\]$/, "$1");
 
@@ -43,13 +58,7 @@ export function renderField(container: HTMLElement, field: FieldDef, ctx: FieldC
       renderChips(setting, field, ctx, asList(value), (s) => s);
       break;
     case "link":
-      if (field.multiple) renderChips(setting, field, ctx, asList(value).map(unwrapLink), (s) => s);
-      else {
-        // shortcut: plain text until the vault search in phase 4
-        setting.addText((t) =>
-          t.setPlaceholder("Note title").setValue(unwrapLink(String(value ?? ""))).onChange((v) => ctx.set(field.name, v)),
-        );
-      }
+      renderLink(setting, field, ctx);
       break;
     case "choice": {
       const catalog = ctx.catalog(field.catalog);
@@ -100,10 +109,12 @@ function renderChips(setting: Setting, field: FieldDef, ctx: FieldContext, items
   for (const item of items) chip(wrap, show(item), undefined, false, () => ctx.set(field.name, items.filter((i) => i !== item), true));
   const input = wrap.createEl("input", { type: "text", cls: "vaultsmith-chip-input", attr: { placeholder: "Type and press Enter", "data-field": field.name } });
   const commit = (): boolean => {
+    if (!input.isConnected) return false; // form was redrawn meanwhile
     const text = input.value.trim();
     input.value = "";
-    if (!text || items.some((i) => i.toLowerCase() === text.toLowerCase())) return false;
-    ctx.set(field.name, [...items, text]);
+    const list = asList(ctx.get(field.name));
+    if (!text || list.some((i) => unwrapLink(i).toLowerCase() === text.toLowerCase())) return false;
+    ctx.set(field.name, [...list, text]);
     return true;
   };
   input.addEventListener("keydown", (e) => {
@@ -112,11 +123,14 @@ function renderChips(setting: Setting, field: FieldDef, ctx: FieldContext, items
     e.stopPropagation(); // don't trigger "Create note"
     if (commit()) ctx.set(field.name, ctx.get(field.name), true);
   });
-  // Typed text without Enter must not get lost when the user clicks "Save" right away:
-  // store it now (before the click), redraw the chips afterwards without stealing focus.
+  // Typed text without Enter must not get lost. On blur we wait a moment so a click on a
+  // suggestion (which clears the input) wins; "Save" flushes pending text via COMMIT_EVENT.
   input.addEventListener("blur", () => {
-    if (commit()) window.setTimeout(() => ctx.refresh(), 0);
+    window.setTimeout(() => {
+      if (commit()) ctx.refresh();
+    }, 150);
   });
+  input.addEventListener(COMMIT_EVENT, () => void commit());
 }
 
 function chipBox(setting: Setting): HTMLElement {
@@ -130,6 +144,97 @@ function chip(parent: HTMLElement, text: string, color: string | undefined, inva
   el.createSpan({ text });
   const x = el.createEl("button", { text: "×", cls: "vaultsmith-chip-remove", attr: { "aria-label": `Remove ${text}` } });
   x.addEventListener("click", onRemove);
+}
+
+function renderLink(setting: Setting, field: FieldDef, ctx: FieldContext): void {
+  const current = asList(ctx.get(field.name)).map(unwrapLink);
+  const pick = async (p: LinkPick): Promise<string | null> => {
+    if (p.kind === "note") return ctx.linkText(p.note);
+    if (p.kind === "create") return ctx.createStub(field, p.title);
+    return p.title;
+  };
+
+  if (field.multiple) {
+    renderChips(setting, field, ctx, current, (s) => s);
+    const input = setting.controlEl.querySelector<HTMLInputElement>(`input[data-field="${field.name}"]`)!;
+    input.placeholder = "Search notes…";
+    new LinkSuggest(ctx, field, input, async (p) => {
+      const text = await pick(p);
+      if (text && !current.includes(text)) ctx.set(field.name, [...current, text], true);
+    });
+    return;
+  }
+
+  setting.addText((t) => {
+    t.setPlaceholder("Search notes…")
+      .setValue(current[0] ?? "")
+      .onChange((v) => ctx.set(field.name, v));
+    t.inputEl.dataset.field = field.name;
+    new LinkSuggest(ctx, field, t.inputEl, async (p) => {
+      const text = await pick(p);
+      if (text) ctx.set(field.name, text, true);
+    });
+  });
+}
+
+type LinkPick =
+  | { kind: "note"; note: NoteInfo; alias?: string }
+  | { kind: "create"; title: string }
+  | { kind: "free"; title: string };
+
+/** Fuzzy search over titles and aliases of the field's link targets. */
+class LinkSuggest extends AbstractInputSuggest<LinkPick> {
+  private notes: NoteInfo[];
+
+  constructor(
+    private ctx: FieldContext,
+    private field: FieldDef,
+    private input: HTMLInputElement,
+    private onPick: (pick: LinkPick) => void,
+  ) {
+    super(ctx.app, input);
+    this.notes = ctx.linkTargets(field);
+  }
+
+  getSuggestions(query: string): LinkPick[] {
+    const q = query.trim();
+    if (!q) return [];
+    const fuzzy = prepareFuzzySearch(q);
+    const hits: { pick: LinkPick; score: number }[] = [];
+    for (const note of this.notes) {
+      let best: { score: number; alias?: string } | null = null;
+      for (const name of [note.basename, ...note.aliases]) {
+        const m = fuzzy(name);
+        if (m && (!best || m.score > best.score)) best = { score: m.score, alias: name === note.basename ? undefined : name };
+      }
+      if (best) hits.push({ pick: { kind: "note", note, alias: best.alias }, score: best.score });
+    }
+    const picks = hits.sort((a, b) => b.score - a.score).slice(0, 20).map((h) => h.pick);
+    const lower = q.toLowerCase();
+    const exact = this.notes.some((n) => [n.basename, ...n.aliases].some((x) => x.toLowerCase() === lower));
+    if (!exact) picks.push(this.ctx.stubLabel(this.field) ? { kind: "create", title: q } : { kind: "free", title: q });
+    return picks;
+  }
+
+  renderSuggestion(pick: LinkPick, el: HTMLElement): void {
+    if (pick.kind === "create") {
+      el.setText(`+ Create ${this.ctx.stubLabel(this.field)!.toLowerCase()} "${pick.title}"`);
+      return;
+    }
+    if (pick.kind === "free") {
+      el.setText(`Link to "${pick.title}" (no note yet)`);
+      return;
+    }
+    el.createDiv({ text: pick.note.basename });
+    const extra = [pick.alias ? `alias: ${pick.alias}` : "", this.ctx.schemaLabel(pick.note.schemaId) ?? ""].filter(Boolean).join(" · ");
+    if (extra) el.createDiv({ text: extra, cls: "vaultsmith-suggest-note" });
+  }
+
+  selectSuggestion(pick: LinkPick): void {
+    this.input.value = "";
+    this.close();
+    this.onPick(pick);
+  }
 }
 
 type ChoicePick = CatalogValue | string;

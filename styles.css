@@ -118,3 +118,7 @@
 .vaultsmith-removed {
   color: var(--color-orange);
 }
+
+.vaultsmith-similar {
+  color: var(--text-muted);
+}

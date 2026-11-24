@@ -1,15 +1,15 @@
-import { Modal, Notice, Setting, TFile, normalizePath, parseYaml, stringifyYaml, type TextComponent } from "obsidian";
+import { Modal, Notice, Setting, TFile, normalizePath, parseYaml, prepareSimpleSearch, stringifyYaml, type TextComponent } from "obsidian";
 import { aliasesAfterRename, removedKeys, valuesFromFrontmatter } from "../core/edit";
 import { sanitizeTitle } from "../core/filename";
 import { buildFrontmatter, defaultValues, missingRequired } from "../core/frontmatter";
-import { findDuplicates, type Duplicate, type NoteInfo } from "../core/notes";
+import { findDuplicates, linkCandidates, type Duplicate, type NoteInfo } from "../core/notes";
 import { chainOf, detectSchema, fieldsOf, folderOf, templateOf, type Detection } from "../core/resolve";
 import { fillPlaceholders, mergeFrontmatter, splitFrontmatter } from "../core/template";
 import type { CatalogValue, Config, FieldDef } from "../core/types";
 import type VaultsmithPlugin from "../main";
-import { appendCatalogValue, ensureFolder, listFolders, listNotes, listTemplates, readTemplate } from "../vault/notes";
+import { appendCatalogValue, ensureFolder, linkTextFor, listFolders, listNotes, listTemplates, readTemplate } from "../vault/notes";
 import { CreateValueModal } from "./CreateValueModal";
-import { renderField, type FieldContext } from "./fields";
+import { flushPendingInputs, renderField, type FieldContext } from "./fields";
 
 /** Edit mode: what the note looked like when the dialog opened. */
 interface EditState {
@@ -54,7 +54,7 @@ export class NoteModal extends Modal {
   async onOpen(): Promise<void> {
     this.modalEl.addClass("vaultsmith-modal");
     this.titleEl.setText(this.file ? "Edit properties" : "New note");
-    this.notes = listNotes(this.app).filter((n) => n.path !== this.file?.path);
+    this.notes = listNotes(this.app, this.config).filter((n) => n.path !== this.file?.path);
 
     if (this.file) {
       const fm = { ...(this.app.metadataCache.getFileCache(this.file)?.frontmatter ?? {}) } as Record<string, unknown>;
@@ -239,6 +239,11 @@ export class NoteModal extends Modal {
         if (this.contentEl.isConnected) this.render();
       },
       createValue: (field, typed) => this.createValue(field, typed),
+      linkTargets: (field) => linkCandidates(this.config, this.notes, field.target),
+      linkText: (note) => linkTextFor(this.app, note.path),
+      schemaLabel: (id) => (id === undefined ? undefined : this.config.schemas.get(id)?.label),
+      stubLabel: (field) => this.stubSchema(field)?.label ?? null,
+      createStub: (field, title) => this.createStub(field, title),
     };
   }
 
@@ -258,6 +263,54 @@ export class NoteModal extends Modal {
         resolve,
       ).open();
     });
+  }
+
+  /** Schema a stub for this link field would get: its target, if that can be created directly. */
+  private stubSchema(field: FieldDef) {
+    const schema = field.target === undefined ? undefined : this.config.schemas.get(field.target);
+    return schema && !schema.abstract ? schema : undefined;
+  }
+
+  /**
+   * Creates a minimal note of the field's target type (default status, default folder, template body)
+   * without leaving the dialog. An existing note with that name or alias is reused instead.
+   */
+  private async createStub(field: FieldDef, title: string): Promise<string | null> {
+    const schema = this.stubSchema(field);
+    const { fileName, changed } = sanitizeTitle(title);
+    if (!schema || !fileName) return null;
+    const existing = findDuplicates([fileName, title], this.notes)[0];
+    if (existing) return linkTextFor(this.app, existing.note.path);
+
+    const values = { ...defaultValues(this.config, schema.id), aliases: changed ? [title.trim()] : [] };
+    const fm = buildFrontmatter(this.config, schema.id, values);
+    const templatePath = templateOf(this.config, schema.id);
+    let body = "";
+    let templateFm: Record<string, unknown> | null = null;
+    if (templatePath) {
+      const text = await readTemplate(this.app, templatePath);
+      if (text !== null) {
+        const split = splitFrontmatter(text);
+        body = fillPlaceholders(split.body, fileName, (p) => window.moment().format(p));
+        try {
+          templateFm = split.yaml ? ((parseYaml(split.yaml) as Record<string, unknown> | null) ?? null) : null;
+        } catch {
+          templateFm = null; // a broken template header must not block the stub
+        }
+      }
+    }
+    const folder = normalizePath(folderOf(this.config, schema.id) ?? "");
+    const path = normalizePath(folder && folder !== "/" ? `${folder}/${fileName}.md` : `${fileName}.md`);
+    try {
+      await ensureFolder(this.app, folder === "/" ? "" : folder);
+      const file = await this.app.vault.create(path, `---\n${stringifyYaml(mergeFrontmatter(fm, templateFm))}---\n${body}`);
+      this.notes.push({ path: file.path, basename: file.basename, aliases: values.aliases, schemaId: schema.id });
+      new Notice(`Created ${schema.label.toLowerCase()} "${file.basename}"`);
+      return this.app.metadataCache.fileToLinktext(file, "");
+    } catch (e) {
+      new Notice(`Could not create "${fileName}": ${(e as Error).message}`);
+      return null;
+    }
   }
 
   private renamed(fileName: string): boolean {
@@ -303,7 +356,26 @@ export class NoteModal extends Modal {
       });
       row.appendText(` Rename to "${fileName}" and keep "${edit.file.basename}" as alias`);
     }
-    for (const dup of this.duplicates()) {
+    const dups = this.duplicates();
+    if (!edit && dups.length === 0 && fileName.length >= 3) {
+      const search = prepareSimpleSearch(fileName);
+      const similar = this.notes.filter((n) => [n.basename, ...n.aliases].some((name) => search(name))).slice(0, 3);
+      if (similar.length) {
+        const row = this.infoEl.createDiv({ cls: "vaultsmith-similar" });
+        row.appendText("Did you mean ");
+        similar.forEach((n, i) => {
+          if (i > 0) row.appendText(", ");
+          const a = row.createEl("a", { text: n.basename, href: "#" });
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            void this.app.workspace.openLinkText(n.path, "");
+            this.close();
+          });
+        });
+        row.appendText("?");
+      }
+    }
+    for (const dup of dups) {
       const row = this.infoEl.createDiv({ cls: "vaultsmith-warning" });
       row.appendText(`Already exists: ${dup.note.basename}${dup.matched !== dup.note.basename ? ` (alias "${dup.matched}")` : ""} `);
       const open = row.createEl("a", { text: "Open", href: "#" });
@@ -353,6 +425,7 @@ export class NoteModal extends Modal {
   private async submit(): Promise<void> {
     if (this.busy) return;
     this.errorEl.empty();
+    flushPendingInputs(this.formEl);
     const problem = this.problem();
     if (problem) return void this.errorEl.setText(problem);
     this.busy = true;

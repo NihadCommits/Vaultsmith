@@ -1,14 +1,21 @@
 import { normalizePath, TFile, TFolder, type App } from "obsidian";
 import type { NoteInfo } from "../core/notes";
 import { aliasesOf } from "../core/notes";
-import type { CatalogValue } from "../core/types";
+import { detectSchema } from "../core/resolve";
+import type { CatalogValue, Config } from "../core/types";
 
-export function listNotes(app: App): NoteInfo[] {
-  return app.vault.getMarkdownFiles().map((f) => ({
-    path: f.path,
-    basename: f.basename,
-    aliases: aliasesOf(app.metadataCache.getFileCache(f)?.frontmatter),
-  }));
+/** All notes with aliases and detected type, straight from Obsidian's metadata cache (no own index). */
+export function listNotes(app: App, config: Config): NoteInfo[] {
+  return app.vault.getMarkdownFiles().map((f) => {
+    const fm = app.metadataCache.getFileCache(f)?.frontmatter;
+    return { path: f.path, basename: f.basename, aliases: aliasesOf(fm), schemaId: detectSchema(config, fm)?.schema.id };
+  });
+}
+
+/** Shortest link text that still points to this note unambiguously. */
+export function linkTextFor(app: App, path: string): string {
+  const file = app.vault.getAbstractFileByPath(path);
+  return file instanceof TFile ? app.metadataCache.fileToLinktext(file, "") : path.replace(/\.md$/, "");
 }
 
 /** All folder paths, "" = vault root. */
