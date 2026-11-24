@@ -1,0 +1,12 @@
+{
+  "id": "city",
+  "label": "City",
+  "extends": "place",
+  "fields": [
+    {
+      "name": "population",
+      "label": "Population",
+      "type": "number"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "recipe",
+  "label": "Recipe",
+  "extends": "item",
+  "defaultFolder": "Kitchen/Recipes",
+  "fields": [
+    {
+      "name": "ingredients",
+      "label": "Ingredients",
+      "type": "link",
+      "target": "ingredient",
+      "multiple": true
+    },
+    {
+      "name": "cuisine",
+      "label": "Cuisine",
+      "type": "choice",
+      "catalog": "cuisines"
+    },
+    {
+      "name": "diet",
+      "label": "Diet",
+      "type": "choice",
+      "catalog": "diets",
+      "multiple": true
+    },
+    {
+      "name": "prep_minutes",
+      "label": "Prep time (min)",
+      "type": "number"
+    },
+    {
+      "name": "servings",
+      "label": "Servings",
+      "type": "number"
+    },
+    {
+      "name": "source",
+      "label": "Source",
+      "type": "text"
+    }
+  ]
+}

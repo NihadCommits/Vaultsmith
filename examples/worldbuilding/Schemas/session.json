@@ -1,0 +1,33 @@
+{
+  "id": "session",
+  "label": "Session",
+  "extends": "entry",
+  "defaultFolder": "Campaign/Sessions",
+  "fields": [
+    {
+      "name": "session_number",
+      "label": "Session #",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "played_on",
+      "label": "Played on",
+      "type": "date"
+    },
+    {
+      "name": "characters",
+      "label": "Characters",
+      "type": "link",
+      "target": "character",
+      "multiple": true
+    },
+    {
+      "name": "places",
+      "label": "Places",
+      "type": "link",
+      "target": "place",
+      "multiple": true
+    }
+  ]
+}

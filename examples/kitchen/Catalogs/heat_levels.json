@@ -1,0 +1,26 @@
+{
+  "id": "heat_levels",
+  "label": "Heat",
+  "values": [
+    {
+      "id": "mild",
+      "label": "Mild"
+    },
+    {
+      "id": "medium",
+      "label": "Medium",
+      "color": "orange",
+      "aliases": [
+        "mittel"
+      ]
+    },
+    {
+      "id": "hot",
+      "label": "Hot",
+      "color": "red",
+      "aliases": [
+        "scharf"
+      ]
+    }
+  ]
+}

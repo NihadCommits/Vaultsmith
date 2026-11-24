@@ -1,0 +1,15 @@
+{
+  "id": "place",
+  "label": "Place",
+  "extends": "entry",
+  "subtypeField": "place_type",
+  "defaultFolder": "World/Places",
+  "fields": [
+    {
+      "name": "region",
+      "label": "Region",
+      "type": "link",
+      "target": "place"
+    }
+  ]
+}

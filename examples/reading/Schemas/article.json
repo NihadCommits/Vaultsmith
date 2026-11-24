@@ -1,0 +1,17 @@
+{
+  "id": "article",
+  "label": "Article",
+  "extends": "source",
+  "fields": [
+    {
+      "name": "journal",
+      "label": "Journal",
+      "type": "text"
+    },
+    {
+      "name": "doi",
+      "label": "DOI",
+      "type": "text"
+    }
+  ]
+}

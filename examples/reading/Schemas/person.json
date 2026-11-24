@@ -1,0 +1,6 @@
+{
+  "id": "person",
+  "label": "Person",
+  "extends": "entry",
+  "defaultFolder": "Library/People"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "danger_levels",
+  "label": "Danger",
+  "values": [
+    {
+      "id": "low",
+      "label": "Low",
+      "color": "green"
+    },
+    {
+      "id": "medium",
+      "label": "Medium",
+      "color": "orange"
+    },
+    {
+      "id": "deadly",
+      "label": "Deadly",
+      "color": "red"
+    }
+  ]
+}

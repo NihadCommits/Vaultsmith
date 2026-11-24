@@ -1,0 +1,14 @@
+{
+  "id": "faction",
+  "label": "Faction",
+  "extends": "entry",
+  "defaultFolder": "World/Factions",
+  "fields": [
+    {
+      "name": "leader",
+      "label": "Leader",
+      "type": "link",
+      "target": "character"
+    }
+  ]
+}

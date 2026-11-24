@@ -1,0 +1,28 @@
+{
+  "id": "roles",
+  "label": "Role",
+  "values": [
+    {
+      "id": "player_character",
+      "label": "Player character",
+      "aliases": [
+        "PC"
+      ]
+    },
+    {
+      "id": "ally",
+      "label": "Ally"
+    },
+    {
+      "id": "villain",
+      "label": "Villain"
+    },
+    {
+      "id": "neutral",
+      "label": "Neutral",
+      "aliases": [
+        "NPC"
+      ]
+    }
+  ]
+}

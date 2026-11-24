@@ -1,0 +1,13 @@
+{
+  "id": "dungeon",
+  "label": "Dungeon",
+  "extends": "place",
+  "fields": [
+    {
+      "name": "danger",
+      "label": "Danger",
+      "type": "choice",
+      "catalog": "danger_levels"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "canon_status",
+  "label": "Canon",
+  "values": [
+    {
+      "id": "idea",
+      "label": "Idea",
+      "description": "Just a thought, not used yet."
+    },
+    {
+      "id": "draft",
+      "label": "Draft",
+      "color": "orange",
+      "description": "Being worked out."
+    },
+    {
+      "id": "canon",
+      "label": "Canon",
+      "color": "green",
+      "description": "Happened or is true in the world."
+    },
+    {
+      "id": "retconned",
+      "label": "Retconned",
+      "color": "red",
+      "description": "No longer true."
+    }
+  ]
+}

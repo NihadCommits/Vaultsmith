@@ -1,0 +1,37 @@
+{
+  "id": "reading_status",
+  "label": "Status",
+  "values": [
+    {
+      "id": "unread",
+      "label": "Unread",
+      "aliases": [
+        "ungelesen"
+      ]
+    },
+    {
+      "id": "reading",
+      "label": "Reading",
+      "color": "blue",
+      "aliases": [
+        "lese gerade"
+      ]
+    },
+    {
+      "id": "taking_notes",
+      "label": "Taking notes",
+      "color": "orange",
+      "aliases": [
+        "exzerpieren"
+      ]
+    },
+    {
+      "id": "done",
+      "label": "Done",
+      "color": "green",
+      "aliases": [
+        "fertig"
+      ]
+    }
+  ]
+}

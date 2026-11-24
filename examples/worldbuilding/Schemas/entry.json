@@ -1,0 +1,27 @@
+{
+  "id": "entry",
+  "label": "Entry",
+  "abstract": true,
+  "subtypeField": "type",
+  "fields": [
+    {
+      "name": "canon",
+      "label": "Canon",
+      "type": "choice",
+      "catalog": "canon_status",
+      "default": "idea",
+      "required": true
+    },
+    {
+      "name": "aliases",
+      "label": "Aliases",
+      "type": "list"
+    },
+    {
+      "name": "related",
+      "label": "Related",
+      "type": "link",
+      "multiple": true
+    }
+  ]
+}

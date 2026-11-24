@@ -1,0 +1,24 @@
+{
+  "id": "ratings",
+  "label": "Rating",
+  "values": [
+    {
+      "id": "must_read",
+      "label": "Must read",
+      "color": "green"
+    },
+    {
+      "id": "good",
+      "label": "Good"
+    },
+    {
+      "id": "ok",
+      "label": "OK"
+    },
+    {
+      "id": "skip",
+      "label": "Skip",
+      "color": "red"
+    }
+  ]
+}

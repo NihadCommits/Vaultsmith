@@ -1,0 +1,32 @@
+{
+  "id": "seasons",
+  "label": "Season",
+  "values": [
+    {
+      "id": "spring",
+      "label": "Spring",
+      "aliases": [
+        "Frühling"
+      ]
+    },
+    {
+      "id": "summer",
+      "label": "Summer",
+      "aliases": [
+        "Sommer"
+      ]
+    },
+    {
+      "id": "autumn",
+      "label": "Autumn",
+      "aliases": [
+        "Herbst",
+        "fall"
+      ]
+    },
+    {
+      "id": "winter",
+      "label": "Winter"
+    }
+  ]
+}

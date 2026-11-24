@@ -1,0 +1,49 @@
+{
+  "id": "cuisines",
+  "label": "Cuisine",
+  "values": [
+    {
+      "id": "italian",
+      "label": "Italian",
+      "aliases": [
+        "italienisch"
+      ]
+    },
+    {
+      "id": "indian",
+      "label": "Indian",
+      "aliases": [
+        "indisch"
+      ]
+    },
+    {
+      "id": "levantine",
+      "label": "Levantine",
+      "aliases": [
+        "levantinisch",
+        "orientalisch"
+      ]
+    },
+    {
+      "id": "mexican",
+      "label": "Mexican",
+      "aliases": [
+        "mexikanisch"
+      ]
+    },
+    {
+      "id": "japanese",
+      "label": "Japanese",
+      "aliases": [
+        "japanisch"
+      ]
+    },
+    {
+      "id": "german",
+      "label": "German",
+      "aliases": [
+        "deutsch"
+      ]
+    }
+  ]
+}

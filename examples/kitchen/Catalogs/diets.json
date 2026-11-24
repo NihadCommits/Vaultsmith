@@ -1,0 +1,24 @@
+{
+  "id": "diets",
+  "label": "Diet",
+  "values": [
+    {
+      "id": "vegetarian",
+      "label": "Vegetarian",
+      "aliases": [
+        "vegetarisch"
+      ]
+    },
+    {
+      "id": "vegan",
+      "label": "Vegan"
+    },
+    {
+      "id": "gluten_free",
+      "label": "Gluten-free",
+      "aliases": [
+        "glutenfrei"
+      ]
+    }
+  ]
+}

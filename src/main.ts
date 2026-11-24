@@ -8,6 +8,7 @@ import { openEditNote, openNewNote } from "./ui/NoteModal";
 import { StatusBar, StatusPickerModal } from "./ui/StatusBar";
 import { VaultCheckModal } from "./ui/VaultCheckModal";
 import { pathExists, readConfigFiles } from "./vault/config";
+import { InstallStarterModal } from "./ui/InstallStarterModal";
 
 export default class VaultsmithPlugin extends Plugin {
   settings: VaultsmithSettings = { ...DEFAULT_SETTINGS };
@@ -53,10 +54,15 @@ export default class VaultsmithPlugin extends Plugin {
       },
     });
     this.addCommand({
+      id: "install-starter-config",
+      name: "Install starter config",
+      callback: () => new InstallStarterModal(this).open(),
+    });
+    this.addCommand({
       id: "check-vault",
       name: "Check vault",
       callback: () => {
-        if (!this.config) return void new Notice('Vaultsmith: no valid configuration. Run "Check configuration".');
+        if (!this.config) return void new Notice('Vaultsmith: no valid configuration. Run "Install starter config" or "Check configuration".');
         new VaultCheckModal(this, this.config).open();
       },
     });
@@ -127,6 +133,13 @@ export default class VaultsmithPlugin extends Plugin {
 
   async reloadConfig(): Promise<void> {
     const { schemaFiles, catalogFiles } = await readConfigFiles(this.app, this.settings.configFolder);
+    if (schemaFiles.length === 0 && catalogFiles.length === 0) {
+      // Fresh vault: no nagging, the commands point to "Install starter config".
+      this.issues = [{ level: "error", message: `No configuration in "${this.settings.configFolder}". Run "Install starter config".` }];
+      this.config = undefined;
+      this.statusBar?.update();
+      return;
+    }
     const result = buildConfig(schemaFiles, catalogFiles, (path) => pathExists(this.app, path));
     this.issues = result.issues;
     if (result.config) this.config = result.config;

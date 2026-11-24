@@ -1,0 +1,27 @@
+{
+  "id": "entry",
+  "label": "Entry",
+  "abstract": true,
+  "subtypeField": "type",
+  "fields": [
+    {
+      "name": "status",
+      "label": "Status",
+      "type": "choice",
+      "catalog": "reading_status",
+      "default": "unread",
+      "required": true
+    },
+    {
+      "name": "aliases",
+      "label": "Aliases",
+      "type": "list"
+    },
+    {
+      "name": "topics",
+      "label": "Topics",
+      "type": "link",
+      "multiple": true
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "character",
+  "label": "Character",
+  "extends": "entry",
+  "defaultFolder": "World/Characters",
+  "fields": [
+    {
+      "name": "role",
+      "label": "Role",
+      "type": "choice",
+      "catalog": "roles"
+    },
+    {
+      "name": "faction",
+      "label": "Faction",
+      "type": "link",
+      "target": "faction"
+    },
+    {
+      "name": "home",
+      "label": "Home",
+      "type": "link",
+      "target": "place"
+    }
+  ]
+}

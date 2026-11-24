@@ -482,7 +482,7 @@ export class NoteModal extends Modal {
 
 export function openNewNote(plugin: VaultsmithPlugin): void {
   if (!plugin.config) {
-    new Notice('Vaultsmith: no valid configuration. Run "Check configuration".');
+    new Notice('Vaultsmith: no valid configuration. Run "Install starter config" or "Check configuration".');
     return;
   }
   new NoteModal(plugin, plugin.config).open();
@@ -490,7 +490,7 @@ export function openNewNote(plugin: VaultsmithPlugin): void {
 
 export function openEditNote(plugin: VaultsmithPlugin, file: TFile): void {
   if (!plugin.config) {
-    new Notice('Vaultsmith: no valid configuration. Run "Check configuration".');
+    new Notice('Vaultsmith: no valid configuration. Run "Install starter config" or "Check configuration".');
     return;
   }
   new NoteModal(plugin, plugin.config, file).open();

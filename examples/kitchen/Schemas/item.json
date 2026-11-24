@@ -1,0 +1,21 @@
+{
+  "id": "item",
+  "label": "Item",
+  "abstract": true,
+  "subtypeField": "type",
+  "fields": [
+    {
+      "name": "status",
+      "label": "Status",
+      "type": "choice",
+      "catalog": "kitchen_status",
+      "default": "to_try",
+      "required": true
+    },
+    {
+      "name": "aliases",
+      "label": "Aliases",
+      "type": "list"
+    }
+  ]
+}

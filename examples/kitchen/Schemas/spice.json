@@ -1,0 +1,13 @@
+{
+  "id": "spice",
+  "label": "Spice",
+  "extends": "ingredient",
+  "fields": [
+    {
+      "name": "heat",
+      "label": "Heat",
+      "type": "choice",
+      "catalog": "heat_levels"
+    }
+  ]
+}

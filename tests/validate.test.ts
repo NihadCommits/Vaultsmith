@@ -116,3 +116,18 @@ describe("buildConfig", () => {
     expect(r.config).toBeDefined();
   });
 });
+
+describe("README example config", () => {
+  it("is valid and resolves", () => {
+    const r = buildConfig(
+      [
+        schema({ id: "note", label: "Note", abstract: true, subtypeField: "type", fields: [{ name: "status", label: "Status", type: "choice", catalog: "statuses", default: "to_write" }] }),
+        schema({ id: "book", label: "Book", extends: "note", defaultFolder: "Reading/Books", fields: [{ name: "author", label: "Author", type: "link", target: "person" }, { name: "year", label: "Year", type: "number" }] }),
+        schema({ id: "person", label: "Person", extends: "note", defaultFolder: "People" }),
+      ],
+      [catalog("statuses", [{ id: "to_write", label: "To write" }, { id: "in_progress", label: "In progress", color: "orange" }, { id: "done", label: "Done", color: "green" }])],
+    );
+    expect(r.issues).toEqual([]);
+    expect(r.config?.children.get("note")?.map((s) => s.id)).toEqual(["book", "person"]);
+  });
+});

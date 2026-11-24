@@ -1,0 +1,17 @@
+{
+  "id": "video",
+  "label": "Video",
+  "extends": "source",
+  "fields": [
+    {
+      "name": "channel",
+      "label": "Channel",
+      "type": "text"
+    },
+    {
+      "name": "duration_minutes",
+      "label": "Duration (min)",
+      "type": "number"
+    }
+  ]
+}

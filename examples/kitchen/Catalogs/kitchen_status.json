@@ -1,0 +1,37 @@
+{
+  "id": "kitchen_status",
+  "label": "Status",
+  "values": [
+    {
+      "id": "to_try",
+      "label": "To try",
+      "aliases": [
+        "ausprobieren"
+      ]
+    },
+    {
+      "id": "tried",
+      "label": "Tried",
+      "color": "blue",
+      "aliases": [
+        "probiert"
+      ]
+    },
+    {
+      "id": "favorite",
+      "label": "Favorite",
+      "color": "green",
+      "aliases": [
+        "lieblingsrezept"
+      ]
+    },
+    {
+      "id": "skip",
+      "label": "Skip",
+      "color": "red",
+      "aliases": [
+        "nicht nochmal"
+      ]
+    }
+  ]
+}

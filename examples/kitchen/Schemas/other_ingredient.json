@@ -1,0 +1,5 @@
+{
+  "id": "other_ingredient",
+  "label": "Other",
+  "extends": "ingredient"
+}

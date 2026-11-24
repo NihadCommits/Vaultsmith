@@ -1,0 +1,17 @@
+{
+  "id": "ingredient",
+  "label": "Ingredient",
+  "extends": "item",
+  "abstract": true,
+  "subtypeField": "ingredient_type",
+  "defaultFolder": "Kitchen/Ingredients",
+  "fields": [
+    {
+      "name": "season",
+      "label": "Season",
+      "type": "choice",
+      "catalog": "seasons",
+      "multiple": true
+    }
+  ]
+}
