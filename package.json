@@ -1,6 +1,6 @@
 {
   "name": "vaultsmith",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Create and edit structured Obsidian notes from user-owned schemas and catalogs.",
   "main": "main.js",
   "private": true,

@@ -4,7 +4,7 @@
 
 Vaultsmith legt in [Obsidian](https://obsidian.md) strukturierte Notizen nach **deinen eigenen** Notiztypen an und bearbeitet sie. Ein Dialog, die passenden Felder für jeden Typ, sauberes YAML und eine kleine Statusleiste, mit der du eine Notiz von „zu schreiben“ bis „fertig“ weiterschaltest.
 
-Typen, Felder und Wertelisten liegen als normale JSON-Dateien in deiner Vault. Vaultsmith liefert nur die Mechanik. Notizen, Templates und Konfiguration bleiben lesbar und funktionieren auch ohne das Plugin.
+Typen, Felder und Wertelisten liegen als normale JSON-Dateien in deiner Vault. Vaultsmith liefert nur die Mechanik. Notizen, Templates und Konfiguration bleiben lesbar und funktionieren auch ohne das Plugin. Es arbeitet komplett offline: kein Netzwerkzugriff, kein Konto, keine Telemetrie, und es liest und schreibt nur Dateien in deiner Vault.
 
 ## Warum Vaultsmith
 

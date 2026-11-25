@@ -131,3 +131,33 @@
   margin-left: var(--size-4-2);
   font-size: var(--font-ui-smaller);
 }
+
+/* Catalog colors: set --vaultsmith-color, used by chips; .vaultsmith-colored paints the text. */
+.vaultsmith-color-red {
+  --vaultsmith-color: var(--color-red);
+}
+.vaultsmith-color-orange {
+  --vaultsmith-color: var(--color-orange);
+}
+.vaultsmith-color-yellow {
+  --vaultsmith-color: var(--color-yellow);
+}
+.vaultsmith-color-green {
+  --vaultsmith-color: var(--color-green);
+}
+.vaultsmith-color-cyan {
+  --vaultsmith-color: var(--color-cyan);
+}
+.vaultsmith-color-blue {
+  --vaultsmith-color: var(--color-blue);
+}
+.vaultsmith-color-purple {
+  --vaultsmith-color: var(--color-purple);
+}
+.vaultsmith-color-pink {
+  --vaultsmith-color: var(--color-pink);
+}
+
+.vaultsmith-colored {
+  color: var(--vaultsmith-color);
+}

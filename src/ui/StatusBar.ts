@@ -2,6 +2,7 @@ import { SuggestModal, TFile, type App } from "obsidian";
 import { searchCatalog } from "../core/catalog";
 import { statusInfo, stepStatus, type StatusInfo } from "../core/status";
 import type { CatalogValue } from "../core/types";
+import { colorClass } from "./color";
 import type VaultsmithPlugin from "../main";
 
 /** `‹ ● Researching ›` in Obsidian's status bar for the active note. */
@@ -49,7 +50,7 @@ export class StatusBar {
     arrow("‹", -1, "Previous status");
     const label = this.el.createSpan({ cls: "vaultsmith-status-label", attr: { "aria-label": "Set status" } });
     const dot = label.createSpan({ text: "●", cls: "vaultsmith-status-dot" });
-    if (value?.color) dot.style.setProperty("color", `var(--color-${value.color})`);
+    if (value?.color) dot.addClass("vaultsmith-colored", colorClass(value.color));
     label.createSpan({ text: info.valid ? value?.label ?? "No status" : `${info.value} (unknown)` });
     if (!info.valid) label.addClass("is-invalid");
     label.addEventListener("click", () => this.plugin.pickStatus());
@@ -70,7 +71,7 @@ export class StatusPickerModal extends SuggestModal<CatalogValue> {
   renderSuggestion(value: CatalogValue, el: HTMLElement): void {
     const row = el.createDiv({ cls: "vaultsmith-status-option" });
     const dot = row.createSpan({ text: "● ", cls: "vaultsmith-status-dot" });
-    if (value.color) dot.style.setProperty("color", `var(--color-${value.color})`);
+    if (value.color) dot.addClass("vaultsmith-colored", colorClass(value.color));
     row.createSpan({ text: value.id === this.info.value ? `${value.label} (current)` : value.label });
     if (value.description) el.createDiv({ text: value.description, cls: "vaultsmith-suggest-note" });
   }

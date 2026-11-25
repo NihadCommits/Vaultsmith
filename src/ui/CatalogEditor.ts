@@ -3,6 +3,7 @@ import { findCatalogDuplicate } from "../core/catalog";
 import { catalogFieldNames, countUsage, moveValue, removeValue, renameValue, updateValue } from "../core/maintenance";
 import { COLORS, type CatalogDef, type CatalogValue } from "../core/types";
 import type VaultsmithPlugin from "../main";
+import { colorClass } from "./color";
 import { allFrontmatter, appendCatalogValue, writeCatalog } from "../vault/notes";
 import { CreateValueModal } from "./CreateValueModal";
 
@@ -42,7 +43,7 @@ export class CatalogEditor {
       const s = new Setting(containerEl)
         .setName(value.label)
         .setDesc([value.id, value.aliases?.join(", "), `${used} note${used === 1 ? "" : "s"}`].filter(Boolean).join(" · "));
-      if (value.color) s.nameEl.style.setProperty("color", `var(--color-${value.color})`);
+      if (value.color) s.nameEl.addClass("vaultsmith-colored", colorClass(value.color));
       s.addExtraButton((b) =>
         b.setIcon("arrow-up").setTooltip("Move up").setDisabled(i === 0).onClick(() => this.save(moveValue(catalog, value.id, -1))),
       )

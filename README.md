@@ -4,7 +4,7 @@
 
 Vaultsmith creates and edits structured notes in [Obsidian](https://obsidian.md) from **your own** note types. One dialog, the right fields for each type, clean YAML, and a small status bar to move a note from "to write" to "finished".
 
-Your types, fields and value lists live as plain JSON files in your vault. Vaultsmith only provides the mechanics, so your notes, templates and configuration stay readable and usable without it.
+Your types, fields and value lists live as plain JSON files in your vault. Vaultsmith only provides the mechanics, so your notes, templates and configuration stay readable and usable without it. It works fully offline: no network access, no account, no telemetry, and it only reads and writes files inside your vault.
 
 ## Why Vaultsmith
 

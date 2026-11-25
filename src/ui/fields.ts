@@ -1,5 +1,6 @@
 import { AbstractInputSuggest, Setting, prepareFuzzySearch, type App } from "obsidian";
 import { findCatalogDuplicate, labelOf, searchCatalog } from "../core/catalog";
+import { colorClass } from "./color";
 import type { NoteInfo } from "../core/notes";
 import type { CatalogDef, CatalogValue, FieldDef } from "../core/types";
 
@@ -139,7 +140,7 @@ function chipBox(setting: Setting): HTMLElement {
 
 function chip(parent: HTMLElement, text: string, color: string | undefined, invalid: boolean, onRemove: () => void): void {
   const el = parent.createSpan({ cls: "vaultsmith-chip" });
-  if (color) el.style.setProperty("--vaultsmith-color", `var(--color-${color})`);
+  if (color) el.addClass(colorClass(color));
   if (invalid) el.addClass("is-invalid");
   el.createSpan({ text });
   const x = el.createEl("button", { text: "×", cls: "vaultsmith-chip-remove", attr: { "aria-label": `Remove ${text}` } });
