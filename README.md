@@ -1,4 +1,5 @@
 # Vaultsmith
+https://community.obsidian.md/plugins/vaultsmith
 
 **English** · [Deutsch](README.de.md)
 
